@@ -29,11 +29,11 @@ public class UserController {
     }
 
     private String getJWTToken(String username) {
-        String secretKey = "mySecretKey";
+        String secretKey = "mySecretKey";//todo move to config
         List<GrantedAuthority> grantedAuthorities = AuthorityUtils
                 .commaSeparatedStringToAuthorityList("ROLE_USER");
 
-        String token = Jwts
+        return Jwts
                 .builder()
                 .setId("appsmartJWT")
                 .setSubject(username)
@@ -45,7 +45,5 @@ public class UserController {
                 .setExpiration(new Date(System.currentTimeMillis() + 600000))
                 .signWith(SignatureAlgorithm.HS512,
                         secretKey.getBytes()).compact();
-
-        return token;
     }
 }

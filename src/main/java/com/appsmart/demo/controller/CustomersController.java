@@ -2,6 +2,8 @@ package com.appsmart.demo.controller;
 
 import com.appsmart.demo.model.Customer;
 import com.appsmart.demo.model.Product;
+import com.appsmart.demo.model.dto.CustomerDto;
+import com.appsmart.demo.model.dto.ProductDto;
 import com.appsmart.demo.service.CustomerService;
 import com.appsmart.demo.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +15,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
-@RequestMapping("/")
+@RequestMapping("/api/v1")
 public class CustomersController {
 
     @Autowired
@@ -24,14 +26,14 @@ public class CustomersController {
 
 
     @GetMapping("/customers")
-    public List<Customer> getAllCustomers(@RequestParam(defaultValue = "0") int page,
-                                          @RequestParam(defaultValue = "10") int size) {
+    public List<CustomerDto> getAllCustomers(@RequestParam(defaultValue = "0") int page,
+                                             @RequestParam(defaultValue = "10") int size) {
         return customerService.getAllCustomers(PageRequest.of(page, size));
     }
 
     @PostMapping("/customers")
     @ResponseStatus(HttpStatus.CREATED)
-    public Customer addCustomer(@RequestParam String title) {
+    public CustomerDto addCustomer(@RequestParam String title) {
         return customerService.addCustomer(title);
     }
 
@@ -41,27 +43,27 @@ public class CustomersController {
     }
 
     @GetMapping(value = "/customers/{customerId}")
-    public Customer getCustomer(@PathVariable Long customerId) {
+    public CustomerDto getCustomer(@PathVariable Long customerId) {
         return customerService.getCustomer(customerId);
     }
 
     @PutMapping("/customers/{customerId}")
-    public Customer updateCustomer(@PathVariable Long customerId,
+    public CustomerDto updateCustomer(@PathVariable Long customerId,
                                    @RequestParam String title
     ) {
         return customerService.updateCustomer(customerId, title);
     }
 
     @GetMapping(value = "/customers/{customerId}/products")
-    public List<Product> getProducts(@PathVariable Long customerId,
-                                     @RequestParam(defaultValue = "0") int page,
-                                     @RequestParam(defaultValue = "10") int size) {
+    public List<ProductDto> getProducts(@PathVariable Long customerId,
+                                        @RequestParam(defaultValue = "0") int page,
+                                        @RequestParam(defaultValue = "10") int size) {
         return productService.getProducts(customerId, PageRequest.of(page, size));
     }
 
     @PostMapping("/customers/{customerId}/products")
     @ResponseStatus(HttpStatus.CREATED)
-    public Product addProduct(@PathVariable Long customerId,
+    public ProductDto addProduct(@PathVariable Long customerId,
                               @RequestParam String title,
                               @RequestParam(required = false) String description,
                               @RequestParam BigDecimal price) {

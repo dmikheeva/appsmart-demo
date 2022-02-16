@@ -1,5 +1,6 @@
 package com.appsmart.demo.config;
 
+import com.appsmart.demo.security.config.WebSecurityConfiguration;
 import com.appsmart.demo.service.CustomerService;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.TestConfiguration;

@@ -4,6 +4,7 @@ import com.appsmart.demo.exception.NoCustomerFoundException;
 import com.appsmart.demo.exception.NoProductFoundException;
 import com.appsmart.demo.model.Customer;
 import com.appsmart.demo.model.Product;
+import com.appsmart.demo.model.dto.ProductDto;
 import com.appsmart.demo.repository.CustomerRepository;
 import com.appsmart.demo.repository.ProductRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -13,11 +14,14 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 public class ProductService {
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-dd-yyyy HH:mm:ss");
 
     @Autowired
     ProductRepository productRepository;
@@ -26,13 +30,15 @@ public class ProductService {
     CustomerRepository customerRepository;
 
 
-    public List<Product> getProducts(Long customerId, Pageable pageable) {
+    public List<ProductDto> getProducts(Long customerId, Pageable pageable) {
         return productRepository
                 .findByCustomerId(customerId, pageable)
-                .getContent();
+                .getContent()
+                .stream().map(this::convertToDto)
+                .collect(Collectors.toList());
     }
 
-    public Product addProduct(Long customerId, String title, String description, BigDecimal price) {
+    public ProductDto addProduct(Long customerId, String title, String description, BigDecimal price) {
         Customer customer = customerRepository
                 .findById(customerId)
                 .filter(p -> !p.getIsDeleted())
@@ -47,20 +53,20 @@ public class ProductService {
         if (description != null) {
             product.setDescription(description);
         }
-        return productRepository.save(product);
+        return convertToDto(productRepository.save(product));
     }
 
     public void deleteProduct(Long productId) {
         productRepository.deleteById(productId);
     }
 
-    public Product getProduct(Long productId) {
-        return productRepository
+    public ProductDto getProduct(Long productId) {
+        return convertToDto(productRepository
                 .findById(productId)
-                .orElseThrow(() -> new NoProductFoundException(productId));
+                .orElseThrow(() -> new NoProductFoundException(productId)));
     }
 
-    public Product updateProduct(Long productId, String title, String description) {
+    public ProductDto updateProduct(Long productId, String title, String description) {
         Product product = productRepository
                 .findById(productId)
                 .filter(p -> !p.getIsDeleted())
@@ -71,7 +77,19 @@ public class ProductService {
         if (description != null) {
             product.setDescription(description);
         }
-        return productRepository.save(product);
+        return convertToDto(productRepository.save(product));
+    }
+
+    private ProductDto convertToDto(Product product) {
+        return ProductDto.builder()
+                .id(product.getId())
+                .title(product.getTitle())
+                .description(product.getDescription())
+                .price(product.getPrice())
+                .customerId(product.getCustomerId())
+                .createdAt(product.getCreatedAt().format(formatter))
+                .modifiedAt(product.getModifiedAt() != null ? product.getModifiedAt().format(formatter) : "")
+                .build();
     }
 
 
