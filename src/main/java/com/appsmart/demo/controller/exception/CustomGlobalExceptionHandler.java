@@ -1,4 +1,4 @@
-package com.appsmart.demo.controller;
+package com.appsmart.demo.controller.exception;
 
 import com.appsmart.demo.exception.NoCustomerFoundException;
 import com.appsmart.demo.exception.NoProductFoundException;

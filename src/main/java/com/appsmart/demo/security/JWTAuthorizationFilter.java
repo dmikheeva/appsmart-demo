@@ -1,4 +1,4 @@
-package com.appsmart.demo.config;
+package com.appsmart.demo.security;
 
 import java.io.IOException;
 import java.util.List;
@@ -9,6 +9,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,7 +26,7 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
 
     private final String AUTH_HEADER = "Authorization";
     private final String TOKEN_PREFIX = "Bearer ";
-    private final String SECRET = "mySecretKey";
+    private final String SECRET = "mySecretKey"; //todo move to config
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {

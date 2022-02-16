@@ -29,7 +29,7 @@ public class UserController {
     }
 
     private String getJWTToken(String username) {
-        String secretKey = "mySecretKey";
+        String secretKey = "mySecretKey";//todo move to config
         List<GrantedAuthority> grantedAuthorities = AuthorityUtils
                 .commaSeparatedStringToAuthorityList("ROLE_USER");
 
