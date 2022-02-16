@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://postgres:5432/appsmart-demo
+    username: user
+    password: user
+  liquibase:
+    change-log: classpath:db/master.xml
+logging:
+  level:
+    ROOT: INFO
+    com.appsmart.demo: DEBUG
