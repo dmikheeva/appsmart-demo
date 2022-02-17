@@ -1,4 +1,4 @@
-package com.appsmart.demo.service;
+package com.appsmart.demo.service.impl;
 
 import com.appsmart.demo.exception.NoCustomerFoundException;
 import com.appsmart.demo.exception.NoProductFoundException;
@@ -7,6 +7,7 @@ import com.appsmart.demo.model.Product;
 import com.appsmart.demo.model.dto.ProductDto;
 import com.appsmart.demo.repository.CustomerRepository;
 import com.appsmart.demo.repository.ProductRepository;
+import com.appsmart.demo.service.IProductService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -20,14 +21,14 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-public class ProductService {
+public class ProductService implements IProductService {
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-dd-yyyy HH:mm:ss");
 
     @Autowired
-    ProductRepository productRepository;
+    private ProductRepository productRepository;
 
     @Autowired
-    CustomerRepository customerRepository;
+    private CustomerRepository customerRepository;
 
 
     public List<ProductDto> getProducts(Long customerId, Pageable pageable) {

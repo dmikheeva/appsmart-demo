@@ -1,9 +1,10 @@
-package com.appsmart.demo.service;
+package com.appsmart.demo.service.impl;
 
 import com.appsmart.demo.exception.NoCustomerFoundException;
 import com.appsmart.demo.model.Customer;
 import com.appsmart.demo.model.dto.CustomerDto;
 import com.appsmart.demo.repository.CustomerRepository;
+import com.appsmart.demo.service.ICustomerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -16,11 +17,11 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-public class CustomerService {
+public class CustomerService implements ICustomerService {
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-dd-yyyy HH:mm:ss");
 
     @Autowired
-    CustomerRepository customerRepository;
+    private CustomerRepository customerRepository;
 
     public List<CustomerDto> getAllCustomers(Pageable pageable) {
         return customerRepository
