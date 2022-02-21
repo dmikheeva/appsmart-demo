@@ -2,6 +2,7 @@ package com.appsmart.demo.service.impl;
 
 import com.appsmart.demo.exception.NoCustomerFoundException;
 import com.appsmart.demo.model.Customer;
+import com.appsmart.demo.model.converter.CustomerToDtoConverter;
 import com.appsmart.demo.model.dto.CustomerDto;
 import com.appsmart.demo.repository.CustomerRepository;
 import com.appsmart.demo.service.ICustomerService;
@@ -23,11 +24,14 @@ public class CustomerService implements ICustomerService {
     @Autowired
     private CustomerRepository customerRepository;
 
+    @Autowired
+    private CustomerToDtoConverter converter;
+
     public List<CustomerDto> getAllCustomers(Pageable pageable) {
         return customerRepository
                 .findAll(pageable)
                 .getContent()
-                .stream().map(this::convertToDto)
+                .stream().map(t -> converter.convert(t))
                 .collect(Collectors.toList());
     }
 
@@ -37,15 +41,20 @@ public class CustomerService implements ICustomerService {
                 .title(title)
                 .createdAt(now)
                 .build();
-        return convertToDto(customerRepository.save(customer));
+        return converter.convert(customerRepository.save(customer));
     }
 
     public void deleteCustomer(Long customerId) {
-        customerRepository.deleteById(customerId);
+        Customer customer = customerRepository
+                .findById(customerId)
+                .orElseThrow(() ->
+                        new NoCustomerFoundException(customerId));
+        customer.setIsDeleted(true);
+        customerRepository.save(customer);
     }
 
     public CustomerDto getCustomer(Long customerId) {
-        return convertToDto(customerRepository
+        return converter.convert(customerRepository
                 .findById(customerId)
                 .orElseThrow(() ->
                         new NoCustomerFoundException(customerId)));
@@ -53,22 +62,11 @@ public class CustomerService implements ICustomerService {
 
     public CustomerDto updateCustomer(Long customerId, String title) {
         Customer customer = customerRepository
-                .findById(customerId)
-                .filter(p -> !p.getIsDeleted())
+                .findByIdAndIsDeleted(customerId, false)
                 .orElseThrow(() -> new NoCustomerFoundException(customerId));
         customer.setTitle(title);
         customer.setModifiedAt(ZonedDateTime.now());
-        return convertToDto(customerRepository.save(customer));
-    }
-
-    private CustomerDto convertToDto(Customer customer) {
-        return CustomerDto.builder()
-                .id(customer.getId())
-                .title(customer.getTitle())
-                .createdAt(customer.getCreatedAt().format(formatter))
-                .modifiedAt(customer.getModifiedAt() != null ? customer.getModifiedAt().format(formatter) : "")
-                //todo products
-                .build();
+        return converter.convert(customerRepository.save(customer));
     }
 
 }

@@ -1,5 +1,6 @@
 package com.appsmart.demo.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Data;
 
@@ -13,7 +14,8 @@ public class ProductDto {
     private final String title;
     private final String description;
     private final BigDecimal price;
-    private final Long customerId;
-    private final String createdAt;
-    private final String modifiedAt;
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    private final ZonedDateTime createdAt;
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    private final ZonedDateTime modifiedAt;
 }

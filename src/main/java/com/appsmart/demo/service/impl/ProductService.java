@@ -4,6 +4,7 @@ import com.appsmart.demo.exception.NoCustomerFoundException;
 import com.appsmart.demo.exception.NoProductFoundException;
 import com.appsmart.demo.model.Customer;
 import com.appsmart.demo.model.Product;
+import com.appsmart.demo.model.converter.ProductToDtoConverter;
 import com.appsmart.demo.model.dto.ProductDto;
 import com.appsmart.demo.repository.CustomerRepository;
 import com.appsmart.demo.repository.ProductRepository;
@@ -30,23 +31,25 @@ public class ProductService implements IProductService {
     @Autowired
     private CustomerRepository customerRepository;
 
+    @Autowired
+    private ProductToDtoConverter converter;
+
 
     public List<ProductDto> getProducts(Long customerId, Pageable pageable) {
         return productRepository
                 .findByCustomerId(customerId, pageable)
                 .getContent()
-                .stream().map(this::convertToDto)
+                .stream().map(t -> converter.convert(t))
                 .collect(Collectors.toList());
     }
 
     public ProductDto addProduct(Long customerId, String title, String description, BigDecimal price) {
         Customer customer = customerRepository
-                .findById(customerId)
-                .filter(p -> !p.getIsDeleted())
+                .findByIdAndIsDeleted(customerId, false)
                 .orElseThrow(() -> new NoCustomerFoundException(customerId));
         ZonedDateTime now = ZonedDateTime.now();
         Product product = Product.builder()
-                .customerId(customerId)
+                .customer(customer)
                 .title(title)
                 .createdAt(now)
                 .price(price)
@@ -54,7 +57,7 @@ public class ProductService implements IProductService {
         if (description != null) {
             product.setDescription(description);
         }
-        return convertToDto(productRepository.save(product));
+        return converter.convert(productRepository.save(product));
     }
 
     public void deleteProduct(Long productId) {
@@ -62,15 +65,14 @@ public class ProductService implements IProductService {
     }
 
     public ProductDto getProduct(Long productId) {
-        return convertToDto(productRepository
+        return converter.convert(productRepository
                 .findById(productId)
                 .orElseThrow(() -> new NoProductFoundException(productId)));
     }
 
     public ProductDto updateProduct(Long productId, String title, String description) {
         Product product = productRepository
-                .findById(productId)
-                .filter(p -> !p.getIsDeleted())
+                .findByIdAndIsDeleted(productId, false)
                 .orElseThrow(() -> new NoProductFoundException(productId));
         if (title != null) {
             product.setTitle(title);
@@ -78,19 +80,7 @@ public class ProductService implements IProductService {
         if (description != null) {
             product.setDescription(description);
         }
-        return convertToDto(productRepository.save(product));
-    }
-
-    private ProductDto convertToDto(Product product) {
-        return ProductDto.builder()
-                .id(product.getId())
-                .title(product.getTitle())
-                .description(product.getDescription())
-                .price(product.getPrice())
-                .customerId(product.getCustomerId())
-                .createdAt(product.getCreatedAt().format(formatter))
-                .modifiedAt(product.getModifiedAt() != null ? product.getModifiedAt().format(formatter) : "")
-                .build();
+        return converter.convert(productRepository.save(product));
     }
 
 

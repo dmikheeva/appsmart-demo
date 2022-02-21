@@ -34,6 +34,6 @@ public class Customer {
     @Column(name = "modified_at")
     private ZonedDateTime modifiedAt;
 
-    @OneToMany(mappedBy = "customerId")
+    @OneToMany(mappedBy = "customer")
     private List<Product> products;
 }

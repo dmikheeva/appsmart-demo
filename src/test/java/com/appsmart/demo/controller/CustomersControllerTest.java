@@ -3,7 +3,7 @@ package com.appsmart.demo.controller;
 import com.appsmart.demo.config.DefaultTestConfig;
 import com.appsmart.demo.model.Customer;
 import com.appsmart.demo.repository.CustomerRepository;
-import com.appsmart.demo.service.ProductService;
+import com.appsmart.demo.service.impl.ProductService;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
