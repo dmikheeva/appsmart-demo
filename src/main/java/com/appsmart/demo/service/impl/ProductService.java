@@ -58,7 +58,12 @@ public class ProductService implements IProductService {
     }
 
     public void deleteProduct(Long productId) {
-        productRepository.deleteById(productId);
+        Product product = productRepository
+                .findById(productId)
+                .orElseThrow(() ->
+                        new NoCustomerFoundException(productId));
+        product.setIsDeleted(true);
+        productRepository.save(product);
     }
 
     public ProductDto getProduct(Long productId) {
