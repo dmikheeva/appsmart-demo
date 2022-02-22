@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
-    Page<Product> findByCustomerId(Long customerId, Pageable pageable);
+    Page<Product> findByCustomerIdAndIsDeleted(Long customerId, boolean isDeleted, Pageable pageable);
 
     Optional<Product> findByIdAndIsDeleted(Long id, boolean isDeleted);
 }

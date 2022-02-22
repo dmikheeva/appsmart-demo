@@ -28,7 +28,7 @@ public class CustomerService implements ICustomerService {
 
     public Page<CustomerDto> getAllCustomers(Pageable pageable) {
         return customerRepository
-                .findAll(pageable)
+                .findAllByIsDeleted(false, pageable)
                 .map(t -> converter.convert(t));
     }
 
@@ -43,7 +43,7 @@ public class CustomerService implements ICustomerService {
 
     public void deleteCustomer(Long customerId) {
         Customer customer = customerRepository
-                .findById(customerId)
+                .findByIdAndIsDeleted(customerId, false)
                 .orElseThrow(() ->
                         new NoCustomerFoundException(customerId));
         customer.setIsDeleted(true);
@@ -52,7 +52,7 @@ public class CustomerService implements ICustomerService {
 
     public CustomerDto getCustomer(Long customerId) {
         return converter.convert(customerRepository
-                .findById(customerId)
+                .findByIdAndIsDeleted(customerId, false)
                 .orElseThrow(() ->
                         new NoCustomerFoundException(customerId)));
     }

@@ -40,7 +40,7 @@ public class CustomersControllerTest {
                 .id(1L)
                 .title("Test")
                 .build();
-        Mockito.when(customerRepository.findById(1L))
+        Mockito.when(customerRepository.findByIdAndIsDeleted(1L, false))
                 .thenReturn(Optional.of(testCustomer));
         this.mockMvc.perform(get("/customers/1"))
                 .andExpect(status().isOk())
@@ -51,7 +51,7 @@ public class CustomersControllerTest {
 
     @Test
     public void whenGetNonExistentCustomer_thenStatusNotFound() throws Exception {
-        Mockito.when(customerRepository.findById(1L))
+        Mockito.when(customerRepository.findByIdAndIsDeleted(1L, false))
                 .thenReturn(Optional.empty());
         this.mockMvc.perform(get("/customers/1"))
                 .andExpect(status().isNotFound());
@@ -65,7 +65,7 @@ public class CustomersControllerTest {
                 .title("Test")
                 .isDeleted(false)
                 .build();
-        Mockito.when(customerRepository.findById(1L))
+        Mockito.when(customerRepository.findByIdAndIsDeleted(1L, false))
                 .thenReturn(Optional.of(testCustomer));
         Mockito.when(customerRepository.save(Mockito.any()))
                 .thenAnswer(i -> i.getArguments()[0]);

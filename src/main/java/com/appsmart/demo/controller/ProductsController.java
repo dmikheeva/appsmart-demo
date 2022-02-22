@@ -47,6 +47,12 @@ public class ProductsController {
                                  @RequestParam String title,
                                  @RequestParam(required = false) String description,
                                  @RequestParam BigDecimal price) {
-        return productService.addProduct(customerId, title, description, price);
+        ProductDto productDto = ProductDto.builder()
+                .customerId(customerId)
+                .title(title)
+                .description(description)
+                .price(price)
+                .build();
+        return productService.addProduct(productDto);
     }
 }

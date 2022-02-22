@@ -11,6 +11,7 @@ import java.time.ZonedDateTime;
 @Builder
 public class ProductDto {
     private final Long id;
+    private final Long customerId;
     private final String title;
     private final String description;
     private final BigDecimal price;

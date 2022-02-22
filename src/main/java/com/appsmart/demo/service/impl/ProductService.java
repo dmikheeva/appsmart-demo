@@ -2,8 +2,8 @@ package com.appsmart.demo.service.impl;
 
 import com.appsmart.demo.exception.NoCustomerFoundException;
 import com.appsmart.demo.exception.NoProductFoundException;
-import com.appsmart.demo.model.Customer;
 import com.appsmart.demo.model.Product;
+import com.appsmart.demo.model.converter.DtoToProductConverter;
 import com.appsmart.demo.model.converter.ProductToDtoConverter;
 import com.appsmart.demo.model.dto.ProductDto;
 import com.appsmart.demo.repository.CustomerRepository;
@@ -15,7 +15,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -31,35 +30,27 @@ public class ProductService implements IProductService {
     private CustomerRepository customerRepository;
 
     @Autowired
-    private ProductToDtoConverter converter;
+    private ProductToDtoConverter productToDtoConverter;
+
+    @Autowired
+    private DtoToProductConverter dtoToProductConverter;
 
 
     public Page<ProductDto> getProducts(Long customerId, Pageable pageable) {
         return productRepository
-                .findByCustomerId(customerId, pageable)
-                .map(t -> converter.convert(t));
+                .findByCustomerIdAndIsDeleted(customerId, false, pageable)
+                .map(t -> productToDtoConverter.convert(t));
     }
 
-    public ProductDto addProduct(Long customerId, String title, String description, BigDecimal price) {
-        Customer customer = customerRepository
-                .findByIdAndIsDeleted(customerId, false)
-                .orElseThrow(() -> new NoCustomerFoundException(customerId));
-        ZonedDateTime now = ZonedDateTime.now();
-        Product product = Product.builder()
-                .customer(customer)
-                .title(title)
-                .createdAt(now)
-                .price(price)
-                .build();
-        if (description != null) {
-            product.setDescription(description);
-        }
-        return converter.convert(productRepository.save(product));
+    public ProductDto addProduct(ProductDto productDto) {
+        Product product = dtoToProductConverter.convert(productDto);
+        assert product != null;
+        return productToDtoConverter.convert(productRepository.save(product));
     }
 
     public void deleteProduct(Long productId) {
         Product product = productRepository
-                .findById(productId)
+                .findByIdAndIsDeleted(productId, false)
                 .orElseThrow(() ->
                         new NoCustomerFoundException(productId));
         product.setIsDeleted(true);
@@ -67,8 +58,8 @@ public class ProductService implements IProductService {
     }
 
     public ProductDto getProduct(Long productId) {
-        return converter.convert(productRepository
-                .findById(productId)
+        return productToDtoConverter.convert(productRepository
+                .findByIdAndIsDeleted(productId, false)
                 .orElseThrow(() -> new NoProductFoundException(productId)));
     }
 
@@ -82,7 +73,7 @@ public class ProductService implements IProductService {
         if (description != null) {
             product.setDescription(description);
         }
-        return converter.convert(productRepository.save(product));
+        return productToDtoConverter.convert(productRepository.save(product));
     }
 
 
