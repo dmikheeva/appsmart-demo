@@ -11,14 +11,13 @@ import com.appsmart.demo.repository.ProductRepository;
 import com.appsmart.demo.service.IProductService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -35,12 +34,10 @@ public class ProductService implements IProductService {
     private ProductToDtoConverter converter;
 
 
-    public List<ProductDto> getProducts(Long customerId, Pageable pageable) {
+    public Page<ProductDto> getProducts(Long customerId, Pageable pageable) {
         return productRepository
                 .findByCustomerId(customerId, pageable)
-                .getContent()
-                .stream().map(t -> converter.convert(t))
-                .collect(Collectors.toList());
+                .map(t -> converter.convert(t));
     }
 
     public ProductDto addProduct(Long customerId, String title, String description, BigDecimal price) {

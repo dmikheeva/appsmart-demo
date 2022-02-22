@@ -8,13 +8,12 @@ import com.appsmart.demo.repository.CustomerRepository;
 import com.appsmart.demo.service.ICustomerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -27,12 +26,10 @@ public class CustomerService implements ICustomerService {
     @Autowired
     private CustomerToDtoConverter converter;
 
-    public List<CustomerDto> getAllCustomers(Pageable pageable) {
+    public Page<CustomerDto> getAllCustomers(Pageable pageable) {
         return customerRepository
                 .findAll(pageable)
-                .getContent()
-                .stream().map(t -> converter.convert(t))
-                .collect(Collectors.toList());
+                .map(t -> converter.convert(t));
     }
 
     public CustomerDto addCustomer(String title) {
